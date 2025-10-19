@@ -1,18 +1,18 @@
-# Use an ARM64-compatible Python base image
+# Use Python 3.11 slim as base (ARM64 compatible)
 FROM --platform=linux/arm64 python:3.11-slim
 
-# Set work directory
+# Set workdir
 WORKDIR /app
 
-# Install system dependencies for Python packages
+# Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     ca-certificates \
     wget \
     tar \
     xz-utils \
-    fontconfig \
-    fonts-liberation \
+    git \
+    pkg-config \
     libssl-dev \
     libffi-dev \
     libjpeg-dev \
@@ -24,18 +24,26 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libopus-dev \
     libmp3lame-dev \
     libfreetype6-dev \
-    git \
+    libwebp-dev \
+    fontconfig \
+    fonts-liberation \
+    ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy application files
-COPY ./ /app/
-
-# Upgrade pip and install Python dependencies
+# Upgrade pip
 RUN pip install --no-cache-dir --upgrade pip
+
+# Copy requirements first (leverage Docker cache)
+COPY requirements.txt .
+
+# Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Expose port for the app
+# Copy the rest of the app
+COPY ./ ./
+
+# Expose port
 EXPOSE 8080
 
-# Default command to run the app
+# Command to run your app (adjust if you use gunicorn)
 CMD ["gunicorn", "-c", "gunicorn.conf.py", "app:app"]
