@@ -1,25 +1,24 @@
 version: '3.8'
-
 services:
   nca-toolkit:
     build:
-      context: ./
-      dockerfile: Dockerfile
+      context: 'https://github.com/stephengpope/no-code-architects-toolkit.git'
+      platforms:
+        - linux/arm64
     container_name: nca-toolkit
-    platform: linux/arm64
-    environment: 
-      - 'API_KEY=${API_KEY}' 
-      - 'S3_ENDPOINT_URL=${S3_ENDPOINT_URL}'
-      - 'S3_ACCESS_KEY=${S3_ACCESS_KEY}' 
-      - 'S3_SECRET_KEY=${S3_SECRET_KEY}' 
-      - 'S3_BUCKET_NAME=nca-toolkit' 
-      - 'S3_REGION=None'
-    expose:
-      - '8080'
+    ports:
+      - '8080:8080'
+    environment:
+      - API_KEY=${API_KEY}
+      - S3_ENDPOINT_URL=${S3_ENDPOINT_URL}
+      - S3_ACCESS_KEY=${S3_ACCESS_KEY}
+      - S3_SECRET_KEY=${S3_SECRET_KEY}
+      - S3_BUCKET_NAME=nca-toolkit
+      - S3_REGION=us-east-1
     networks:
-      - nca-network
+      - nca-toolkit
     restart: unless-stopped
-
+    image: ''
 networks:
-  nca-network:
+  nca-toolkit:
     driver: bridge
